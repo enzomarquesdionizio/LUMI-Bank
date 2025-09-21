@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="Lumi-Bank.css">
 </head>
 <body class="min-h-screen bg-gradient-to-b from-[#0B1020] to-[#0E1428] text-slate-100 selection:bg-emerald-300/40 selection:text-slate-900">
+    
   <!-- Time-of-day themed containers -->
   <div id="morning" class="hidden relative min-h-screen overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-b from-[#FFF9E9] via-[#F0FBFF] to-[#D6F3FF]"></div>
@@ -43,89 +44,92 @@
           </h2>
           <p class="mt-4 text-slate-700 text-lg">Comece o dia com clareza. O <span class="font-semibold text-emerald-700">Lumi Guide</span> revela as próximas ações para você avançar.</p>
           <div class="mt-6 flex flex-wrap gap-3">
-            <button id="btnLanternaMorning" class="lantern-cta glow-btn rounded-xl bg-emerald-500 text-emerald-950 font-extrabold px-5 py-3 shadow-emerald-500/30 shadow-lg">
+            <button id="btnLanternaMorning" onclick="startJourney()" class="lantern-cta glow-btn rounded-xl bg-emerald-500 text-emerald-950 font-extrabold px-5 py-3 shadow-emerald-500/30 shadow-lg">
               Acender tudo
             </button>
             <button id="btnToggleDayNight1" class="glow-btn rounded-xl bg-white/70 text-slate-900 font-bold px-5 py-3">Ver modo noite</button>
             <button id="btnGoSimMorning" class="glow-btn rounded-xl bg-slate-900 text-white font-bold px-5 py-3">Montar Constelação</button>
           </div>
         </div>
-                        <div class="relative animate-float">
-                    <div class="w-80 h-96 mx-auto relative">
-                        <!-- Phone mockup -->
-                        <div class="absolute inset-0 glass-effect rounded-3xl p-2 glow-effect">
-                            <div class="bg-gray-900 rounded-2xl h-full flex flex-col overflow-hidden border border-gray-700">
-                                <!-- Phone header -->
-                                <div class="flex justify-between items-center p-3 border-b border-gray-800">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-5 h-5 level-badge rounded-full flex items-center justify-center text-xs font-bold text-black">7</div>
-                                        <span class="text-xs font-semibold">Nível Investidor</span>
-                                    </div>
-                                    <div class="flex items-center space-x-1">
-                                        <span class="text-xs coin-animation">🪙</span>
-                                        <span class="text-xs font-semibold text-yellow-400">1,247</span>
+
+        <div class="relative animate-float">
+        <div class="w-80 h-96 mx-auto relative">
+            <!-- Phone mockup -->
+            <div class="absolute inset-0 glass-effect rounded-3xl p-2 glow-effect">
+                <div class="bg-gray-900 rounded-2xl h-full flex flex-col overflow-hidden border border-gray-700">
+                    <!-- Phone header -->
+                    <div class="flex justify-between items-center p-3 border-b border-gray-800">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 level-badge rounded-full flex items-center justify-center text-xs font-bold text-black">7</div>
+                            <span class="text-xs font-semibold">Nível Investidor</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xs coin-animation">🪙</span>
+                            <span class="text-xs font-semibold text-yellow-400">1,247</span>
+                        </div>
+                    </div>
+                                
+                    <div class="p-3 flex-1 overflow-y-auto">
+                        <!-- Saldo Atual -->
+                        <div class="text-center mb-4">
+                            <div class="w-10 h-10 gradient-bg rounded-full mx-auto mb-2 flex items-center justify-center glow-effect">
+                                <span class="text-base">💰</span>
+                            </div>
+                            <h3 class="text-xs font-semibold">Saldo Atual</h3>
+                            <p class="text-lg font-bold text-lumi-green">R$ 2.847,50</p>
+                            <div class="text-xs text-gray-400 mt-1">+R$ 127,30 hoje 📈</div>
+                        </div>
+                                    
+                        <!-- Missões Diárias -->
+                        <div class="mb-4">
+                            <h4 class="text-xs font-semibold text-gray-300 mb-2">🎯 MISSÕES DIÁRIAS</h4>
+                            <div class="space-y-2">
+                                <div class="mission-card mission-completed rounded-lg p-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-green-400">✅</span>
+                                            <span class="text-xs">Economizar R$ 20</span>
+                                        </div>
+                                        <span class="text-xs text-yellow-400">+25 🪙</span>
                                     </div>
                                 </div>
-                                
-                                <div class="p-3 flex-1 overflow-y-auto">
-                                    <!-- Saldo Atual -->
-                                    <div class="text-center mb-4">
-                                        <div class="w-10 h-10 gradient-bg rounded-full mx-auto mb-2 flex items-center justify-center glow-effect">
-                                            <span class="text-base">💰</span>
+                                <div class="mission-card rounded-lg p-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-lumi-blue">⏳</span>
+                                            <span class="text-xs">Pagar conta de luz</span>
                                         </div>
-                                        <h3 class="text-xs font-semibold">Saldo Atual</h3>
-                                        <p class="text-lg font-bold text-lumi-green">R$ 2.847,50</p>
-                                        <div class="text-xs text-gray-400 mt-1">+R$ 127,30 hoje 📈</div>
-                                    </div>
-                                    
-                                    <!-- Missões Diárias -->
-                                    <div class="mb-4">
-                                        <h4 class="text-xs font-semibold text-gray-300 mb-2">🎯 MISSÕES DIÁRIAS</h4>
-                                        <div class="space-y-2">
-                                            <div class="mission-card mission-completed rounded-lg p-2">
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-green-400">✅</span>
-                                                        <span class="text-xs">Economizar R$ 20</span>
-                                                    </div>
-                                                    <span class="text-xs text-yellow-400">+25 🪙</span>
-                                                </div>
-                                            </div>
-                                            <div class="mission-card rounded-lg p-2">
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-lumi-blue">⏳</span>
-                                                        <span class="text-xs">Pagar conta de luz</span>
-                                                    </div>
-                                                    <span class="text-xs text-yellow-400">+15 🪙</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Transações Recentes -->
-                                    <div>
-                                        <h4 class="text-xs font-semibold text-gray-300 mb-2">💳 TRANSAÇÕES RECENTES</h4>
-                                        <div class="space-y-1">
-                                            <div class="flex justify-between items-center text-xs">
-                                                <div class="flex items-center space-x-2">
-                                                    <span class="text-green-400">📈</span>
-                                                    <span>Rendimento CDB</span>
-                                                </div>
-                                                <span class="text-green-400 font-semibold">+R$ 45,30</span>
-                                            </div>
-                                            <div class="flex justify-between items-center text-xs">
-                                                <div class="flex items-center space-x-2">
-                                                    <span class="text-red-400">🛒</span>
-                                                    <span>Supermercado</span>
-                                                </div>
-                                                <span class="text-red-400 font-semibold">-R$ 127,80</span>
-                                            </div>
-                                        </div>
+                                        <span class="text-xs text-yellow-400">+15 🪙</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                                    
+                        <!-- Transações Recentes -->
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-300 mb-2">💳 TRANSAÇÕES RECENTES</h4>
+                            <div class="space-y-1">
+                                <div class="flex justify-between items-center text-xs">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-green-400">📈</span>
+                                        <span>Rendimento CDB</span>
+                                    </div>
+                                    <span class="text-green-400 font-semibold">+R$ 45,30</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-red-400">🛒</span>
+                                        <span>Supermercado</span>
+                                    </div>
+                                    <span class="text-red-400 font-semibold">-R$ 127,80</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>    
       </section>
     </div>
   </div>
@@ -156,7 +160,7 @@
         <p style="margin-top: -15px;" class="text-xl text-gray-300 mb-8 leading-relaxed max-w-2xl mx-auto lg:mx-0">O Lumi é o banco digital que <span class="text-lumi-green font-semibold">gamifica</span> a educação financeira, ensinando jovens a construir uma vida financeira sólida através de <span class="text-lumi-blue font-semibold">desafios, conquistas e recompensas reais</span>.</p>
         <p style="margin-top: -28px;" class="mt-1 text-slate-300 text-lg">Navegue com o <span class="font-semibold text-emerald-300">Lumi Guide</span>, a bolinha que guia e dá dicas personalizadas.</p>
         <div class="mt-6 flex flex-wrap gap-3">
-          <button id="btnLanternaNight" class="lantern-cta glow-btn rounded-xl bg-emerald-400 text-emerald-950 font-extrabold px-5 py-3 shadow-emerald-400/30 shadow-lg">
+          <button id="btnLanternaNight" onclick="startJourney()" class="lantern-cta glow-btn rounded-xl bg-emerald-400 text-emerald-950 font-extrabold px-5 py-3 shadow-emerald-400/30 shadow-lg">
             Acender tudo
           </button>
           <button id="btnToggleDayNight2" class="glow-btn rounded-xl bg-slate-800/70 text-slate-100 font-bold px-5 py-3">Ver modo manhã</button>
@@ -164,82 +168,84 @@
         </div>
       </section>
 
-                <div class="relative animate-float">
-                    <div class="w-80 h-96 mx-auto relative">
-                        <!-- Phone mockup -->
-                        <div class="absolute inset-0 glass-effect rounded-3xl p-2 glow-effect">
-                            <div class="bg-gray-900 rounded-2xl h-full flex flex-col overflow-hidden border border-gray-700">
-                                <!-- Phone header -->
-                                <div class="flex justify-between items-center p-3 border-b border-gray-800">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-5 h-5 level-badge rounded-full flex items-center justify-center text-xs font-bold text-black">7</div>
-                                        <span class="text-xs font-semibold">Nível Investidor</span>
-                                    </div>
-                                    <div class="flex items-center space-x-1">
-                                        <span class="text-xs coin-animation">🪙</span>
-                                        <span class="text-xs font-semibold text-yellow-400">1,247</span>
+        <div class="relative animate-float">
+        <div class="w-80 h-96 mx-auto relative">
+            <!-- Phone mockup -->
+            <div class="absolute inset-0 glass-effect rounded-3xl p-2 glow-effect">
+                <div class="bg-gray-900 rounded-2xl h-full flex flex-col overflow-hidden border border-gray-700">
+                    <!-- Phone header -->
+                    <div class="flex justify-between items-center p-3 border-b border-gray-800">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 level-badge rounded-full flex items-center justify-center text-xs font-bold text-black">7</div>
+                            <span class="text-xs font-semibold">Nível Investidor</span>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xs coin-animation">🪙</span>
+                            <span class="text-xs font-semibold text-yellow-400">1,247</span>
+                        </div>
+                    </div>
+                                
+                    <div class="p-3 flex-1 overflow-y-auto">
+                        <!-- Saldo Atual -->
+                        <div class="text-center mb-4">
+                            <div class="w-10 h-10 gradient-bg rounded-full mx-auto mb-2 flex items-center justify-center glow-effect">
+                                <span class="text-base">💰</span>
+                            </div>
+                            <h3 class="text-xs font-semibold">Saldo Atual</h3>
+                            <p class="text-lg font-bold text-lumi-green">R$ 2.847,50</p>
+                            <div class="text-xs text-gray-400 mt-1">+R$ 127,30 hoje 📈</div>
+                        </div>
+                                    
+                        <!-- Missões Diárias -->
+                        <div class="mb-4">
+                            <h4 class="text-xs font-semibold text-gray-300 mb-2">🎯 MISSÕES DIÁRIAS</h4>
+                            <div class="space-y-2">
+                                <div class="mission-card mission-completed rounded-lg p-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-green-400">✅</span>
+                                            <span class="text-xs">Economizar R$ 20</span>
+                                        </div>
+                                        <span class="text-xs text-yellow-400">+25 🪙</span>
                                     </div>
                                 </div>
-                                
-                                <div class="p-3 flex-1 overflow-y-auto">
-                                    <!-- Saldo Atual -->
-                                    <div class="text-center mb-4">
-                                        <div class="w-10 h-10 gradient-bg rounded-full mx-auto mb-2 flex items-center justify-center glow-effect">
-                                            <span class="text-base">💰</span>
+                                <div class="mission-card rounded-lg p-2">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-lumi-blue">⏳</span>
+                                            <span class="text-xs">Pagar conta de luz</span>
                                         </div>
-                                        <h3 class="text-xs font-semibold">Saldo Atual</h3>
-                                        <p class="text-lg font-bold text-lumi-green">R$ 2.847,50</p>
-                                        <div class="text-xs text-gray-400 mt-1">+R$ 127,30 hoje 📈</div>
-                                    </div>
-                                    
-                                    <!-- Missões Diárias -->
-                                    <div class="mb-4">
-                                        <h4 class="text-xs font-semibold text-gray-300 mb-2">🎯 MISSÕES DIÁRIAS</h4>
-                                        <div class="space-y-2">
-                                            <div class="mission-card mission-completed rounded-lg p-2">
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-green-400">✅</span>
-                                                        <span class="text-xs">Economizar R$ 20</span>
-                                                    </div>
-                                                    <span class="text-xs text-yellow-400">+25 🪙</span>
-                                                </div>
-                                            </div>
-                                            <div class="mission-card rounded-lg p-2">
-                                                <div class="flex items-center justify-between">
-                                                    <div class="flex items-center space-x-2">
-                                                        <span class="text-lumi-blue">⏳</span>
-                                                        <span class="text-xs">Pagar conta de luz</span>
-                                                    </div>
-                                                    <span class="text-xs text-yellow-400">+15 🪙</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Transações Recentes -->
-                                    <div>
-                                        <h4 class="text-xs font-semibold text-gray-300 mb-2">💳 TRANSAÇÕES RECENTES</h4>
-                                        <div class="space-y-1">
-                                            <div class="flex justify-between items-center text-xs">
-                                                <div class="flex items-center space-x-2">
-                                                    <span class="text-green-400">📈</span>
-                                                    <span>Rendimento CDB</span>
-                                                </div>
-                                                <span class="text-green-400 font-semibold">+R$ 45,30</span>
-                                            </div>
-                                            <div class="flex justify-between items-center text-xs">
-                                                <div class="flex items-center space-x-2">
-                                                    <span class="text-red-400">🛒</span>
-                                                    <span>Supermercado</span>
-                                                </div>
-                                                <span class="text-red-400 font-semibold">-R$ 127,80</span>
-                                            </div>
-                                        </div>
+                                        <span class="text-xs text-yellow-400">+15 🪙</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                                    
+                        <!-- Transações Recentes -->
+                        <div>
+                            <h4 class="text-xs font-semibold text-gray-300 mb-2">💳 TRANSAÇÕES RECENTES</h4>
+                            <div class="space-y-1">
+                                <div class="flex justify-between items-center text-xs">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-green-400">📈</span>
+                                        <span>Rendimento CDB</span>
+                                    </div>
+                                    <span class="text-green-400 font-semibold">+R$ 45,30</span>
+                                </div>
+                                <div class="flex justify-between items-center text-xs">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-red-400">🛒</span>
+                                        <span>Supermercado</span>
+                                    </div>
+                                    <span class="text-red-400 font-semibold">-R$ 127,80</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>   
 
     </main>
 
@@ -288,6 +294,20 @@
   <div id="flash" class="page-flash"></div>
 
     <!-- fim tela inicial luz ------------------------------------------------------------------------------------>
+
+    <!-- Achievement Popup -->
+    <div id="achievement-popup" class="achievement-popup glass-effect rounded-2xl p-4 w-80 z-[110]">
+        <div class="flex items-center space-x-3">
+            <div class="w-12 h-12 level-badge rounded-full flex items-center justify-center">
+                <span id="achievement-icon" class="text-2xl">🏆</span>
+            </div>
+            <div>
+                <h4 class="font-bold text-lumi-white" id="achievement-title">Conquista Desbloqueada!</h4>
+                <p class="text-sm text-gray-300" id="achievement-desc">Primeira simulação realizada</p>
+                <div class="text-xs text-lumi-green font-semibold">+50 XP</div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scroll Progress Indicator -->
     <div class="scroll-indicator">
@@ -2745,47 +2765,10 @@
             
             popup.classList.add('show');
             
-            // Add XP
-            userStats.xp += xp;
-            updateUserStats();
-            
             // Auto hide after 4 seconds
             setTimeout(() => {
                 popup.classList.remove('show');
             }, 4000);
-        }
-
-        // Update user stats display
-        function updateUserStats() {
-            document.getElementById('current-xp').textContent = userStats.xp.toLocaleString();
-            document.getElementById('coin-count').textContent = userStats.coins.toLocaleString();
-            
-            const xpProgress = (userStats.xp / userStats.maxXp) * 100;
-            document.getElementById('xp-progress').style.width = xpProgress + '%';
-            
-            // Level up check
-            if (userStats.xp >= userStats.maxXp) {
-                levelUp();
-            }
-        }
-
-        // Level up system
-        function levelUp() {
-            userStats.level++;
-            userStats.xp = userStats.xp - userStats.maxXp;
-            userStats.maxXp = Math.floor(userStats.maxXp * 1.2);
-            userStats.coins += 100;
-            
-            document.getElementById('user-level').textContent = userStats.level;
-            document.getElementById('max-xp').textContent = userStats.maxXp.toLocaleString();
-            
-            showAchievement('Level Up!', `Parabéns! Você alcançou o nível ${userStats.level}`, '🎉', 0);
-            
-            // Coin animation
-            document.querySelector('.coin-animation').classList.add('coin-animation');
-            setTimeout(() => {
-                document.querySelector('.coin-animation').classList.remove('coin-animation');
-            }, 1000);
         }
 
         // Start Journey Function
@@ -2995,7 +2978,7 @@
             // Award XP for using simulator
             if (!userStats.achievements.includes('first_simulation')) {
                 userStats.achievements.push('first_simulation');
-                showAchievement('Primeira Simulação!', 'Você fez sua primeira simulação de investimento', '📊', 25);
+                //showAchievement('Primeira Simulação!', 'Você fez sua primeira simulação de investimento', '📊', 25);
             }
         }
 
@@ -3083,7 +3066,6 @@
                     if (sectionId && !userStats.achievements.includes(`visited_${sectionId}`)) {
                         userStats.achievements.push(`visited_${sectionId}`);
                         userStats.xp += 10;
-                        updateUserStats();
                     }
                 }
             });
@@ -3163,7 +3145,6 @@
                 userStats.coins += mission.reward;
                 userStats.xp += mission.reward;
                 
-                updateUserStats();
                 showAchievement('Missão Concluída!', mission.title, '🎯', 0);
                 
                 // Update mission display in phone mockup
@@ -3410,7 +3391,6 @@
                     // Award XP and coins for PIX
                     userStats.xp += 15;
                     userStats.coins += 5;
-                    updateUserStats();
                     
                     showAchievement('PIX Enviado!', `R$ ${amount.toFixed(2)} transferido com sucesso`, '✅', 0);
                     
@@ -3561,11 +3541,7 @@
             };
             
             const challenge = challenges[challengeId];
-            if (challenge) {
-                userStats.xp += challenge.reward;
-                userStats.coins += Math.floor(challenge.reward / 10);
-                updateUserStats();
-                
+            if (challenge) {                
                 showAchievement('Desafio Aceito!', `Você entrou no ${challenge.name}`, '🏆', 0);
                 
                 setTimeout(() => {
@@ -3691,7 +3667,6 @@
                     // Award massive XP and coins for account creation
                     userStats.xp += 500;
                     userStats.coins += 500; // Welcome bonus
-                    updateUserStats();
                     
                     showAchievement('Conta Criada!', 'Bem-vindo ao Lumi Bank!', '🎉', 0);
                     
@@ -3744,7 +3719,6 @@
             createParticles();
             calculateInvestment();
             animateBalance();
-            updateUserStats();
             initFormHandler();
             updateTicker();
             
