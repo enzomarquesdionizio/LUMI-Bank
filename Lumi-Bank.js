@@ -471,10 +471,454 @@
     setTimeout(canvasResize, 80);
 
 
-//    <--------------------------------------- FIM ANIMAÇÕES TELA INICIAL ---------------------------->
+// <--------------------------------------- FIM ANIMAÇÕES E FUNCIONALIDADES TELA INICIAL -------------------------------->
 
 
-//    <----------------------------- ANIMAÇÕES E ESTRUTURA DO SITE ----------------------------------->
+// <------------------------------------ INICIO ANIMAÇÕES E FUNCIONALIDADES INDICADORES ECONOMICOS ---------------------->
+
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('mobile-menu-open');
+            menu.classList.toggle('mobile-menu-closed');
+        }
+
+        // Mobile menu button event
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+        // Close mobile menu when clicking on links
+        document.querySelectorAll('.mobile-menu-link').forEach(link => {
+            link.addEventListener('click', () => {
+                setTimeout(toggleMobileMenu, 100);
+            });
+        });
+
+        // Scroll progress
+        window.addEventListener('scroll', () => {
+            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + '%';
+        });
+
+        // Initialize calculator on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateInvestment();
+            updateIndicators();
+            setInterval(updateIndicators, 30000); // Update every 30 seconds
+        });
+
+        // Economic Indicators Data (simulated API responses)
+        const indicatorsData = {
+            selic: {
+                title: 'Taxa Selic',
+                icon: '🏛️',
+                current: '13,75%',
+                description: 'A Taxa Selic é a taxa básica de juros da economia brasileira, definida pelo Comitê de Política Monetária (COPOM) do Banco Central.',
+                trend: 'up',
+                change: '+0,50%',
+                historical: [
+                    { period: '2024', value: '13,75%' },
+                    { period: '2023', value: '13,25%' },
+                    { period: '2022', value: '11,75%' },
+                    { period: '2021', value: '9,25%' }
+                ],
+                impact: 'Uma Selic alta torna investimentos em renda fixa mais atrativos, mas pode desacelerar o crescimento econômico.',
+                nextMeeting: '20 de Março de 2024'
+            },
+            ipca: {
+                title: 'IPCA (Inflação)',
+                icon: '📈',
+                current: '4,62%',
+                description: 'O IPCA é o índice oficial de inflação do Brasil, medindo a variação de preços de produtos e serviços consumidos pelas famílias.',
+                trend: 'down',
+                change: '-0,12%',
+                historical: [
+                    { period: 'Fev/24', value: '4,62%' },
+                    { period: 'Jan/24', value: '4,51%' },
+                    { period: 'Dez/23', value: '4,62%' },
+                    { period: 'Nov/23', value: '4,68%' }
+                ],
+                impact: 'Inflação controlada preserva o poder de compra e favorece investimentos de longo prazo.',
+                target: 'Meta: 3,00% ± 1,5 p.p.'
+            },
+            cdi: {
+                title: 'CDI',
+                icon: '💰',
+                current: '13,65%',
+                description: 'O CDI é a taxa média dos empréstimos entre bancos, servindo como referência para investimentos em renda fixa.',
+                trend: 'stable',
+                change: '0,00%',
+                historical: [
+                    { period: 'Hoje', value: '13,65%' },
+                    { period: 'Ontem', value: '13,65%' },
+                    { period: '1 sem', value: '13,60%' },
+                    { period: '1 mês', value: '13,40%' }
+                ],
+                impact: 'CDI alto beneficia investimentos como CDBs, LCIs e fundos DI.',
+                relation: 'Acompanha de perto a Taxa Selic'
+            },
+            dollar: {
+                title: 'Dólar Americano',
+                icon: '💵',
+                current: 'R$ 5,12',
+                description: 'Cotação do dólar americano em relação ao real brasileiro, importante indicador da economia global.',
+                trend: 'up',
+                change: '+1,23%',
+                historical: [
+                    { period: 'Hoje', value: 'R$ 5,12' },
+                    { period: 'Ontem', value: 'R$ 5,06' },
+                    { period: '1 sem', value: 'R$ 5,08' },
+                    { period: '1 mês', value: 'R$ 4,98' }
+                ],
+                impact: 'Dólar alto encarece importações mas favorece exportações brasileiras.',
+                factors: 'Influenciado por política monetária, cenário político e fluxo de capital'
+            },
+            euro: {
+                title: 'Euro',
+                icon: '🇪🇺',
+                current: 'R$ 5,58',
+                description: 'Cotação do euro em relação ao real, moeda oficial de 19 países da União Europeia.',
+                trend: 'up',
+                change: '+0,87%',
+                historical: [
+                    { period: 'Hoje', value: 'R$ 5,58' },
+                    { period: 'Ontem', value: 'R$ 5,53' },
+                    { period: '1 sem', value: 'R$ 5,51' },
+                    { period: '1 mês', value: 'R$ 5,45' }
+                ],
+                impact: 'Euro forte indica economia europeia sólida e pode afetar comércio bilateral.',
+                economy: 'Segunda maior economia mundial'
+            },
+            bitcoin: {
+                title: 'Bitcoin',
+                icon: '₿',
+                current: 'R$ 267.450',
+                description: 'Primeira e maior criptomoeda do mundo, considerada reserva de valor digital.',
+                trend: 'down',
+                change: '-2,34%',
+                historical: [
+                    { period: 'Hoje', value: 'R$ 267.450' },
+                    { period: 'Ontem', value: 'R$ 273.890' },
+                    { period: '1 sem', value: 'R$ 285.120' },
+                    { period: '1 mês', value: 'R$ 245.670' }
+                ],
+                impact: 'Bitcoin é volátil mas tem potencial de valorização a longo prazo.',
+                warning: 'Investimento de alto risco - invista apenas o que pode perder'
+            },
+            pound: {
+                title: 'Libra Esterlina',
+                icon: '🇬🇧',
+                current: 'R$ 6,47',
+                description: 'Moeda oficial do Reino Unido, uma das mais antigas moedas ainda em circulação.',
+                trend: 'up',
+                change: '+0,45%',
+                historical: [
+                    { period: 'Hoje', value: 'R$ 6,47' },
+                    { period: 'Ontem', value: 'R$ 6,44' },
+                    { period: '1 sem', value: 'R$ 6,41' },
+                    { period: '1 mês', value: 'R$ 6,38' }
+                ],
+                impact: 'Libra forte reflete estabilidade econômica pós-Brexit.',
+                context: 'Influenciada por políticas do Banco da Inglaterra'
+            },
+            ibovespa: {
+                title: 'Ibovespa',
+                icon: '📊',
+                current: '127.845',
+                description: 'Principal índice da bolsa brasileira (B3), composto pelas ações mais negociadas.',
+                trend: 'up',
+                change: '+1,23%',
+                historical: [
+                    { period: 'Hoje', value: '127.845' },
+                    { period: 'Ontem', value: '126.280' },
+                    { period: '1 sem', value: '125.670' },
+                    { period: '1 mês', value: '124.890' }
+                ],
+                impact: 'Ibovespa em alta indica otimismo com empresas brasileiras.',
+                composition: 'Representa ~80% do volume negociado na B3'
+            },
+            sp500: {
+                title: 'S&P 500',
+                icon: '🇺🇸',
+                current: '4.567,89',
+                description: 'Índice que acompanha as 500 maiores empresas americanas por capitalização de mercado.',
+                trend: 'down',
+                change: '-0,45%',
+                historical: [
+                    { period: 'Hoje', value: '4.567,89' },
+                    { period: 'Ontem', value: '4.588,45' },
+                    { period: '1 sem', value: '4.612,30' },
+                    { period: '1 mês', value: '4.534,20' }
+                ],
+                impact: 'S&P 500 é referência global para investimentos em ações.',
+                companies: 'Inclui Apple, Microsoft, Amazon, Google'
+            },
+            nasdaq: {
+                title: 'Nasdaq',
+                icon: '💻',
+                current: '14.234,56',
+                description: 'Índice focado em empresas de tecnologia, incluindo as maiores big techs do mundo.',
+                trend: 'up',
+                change: '+0,78%',
+                historical: [
+                    { period: 'Hoje', value: '14.234,56' },
+                    { period: 'Ontem', value: '14.124,89' },
+                    { period: '1 sem', value: '14.089,45' },
+                    { period: '1 mês', value: '13.987,23' }
+                ],
+                impact: 'Nasdaq reflete o desempenho do setor de tecnologia global.',
+                focus: 'Concentrado em empresas inovadoras e de crescimento'
+            },
+            nikkei: {
+                title: 'Nikkei 225',
+                icon: '🇯🇵',
+                current: '33.567,12',
+                description: 'Principal índice da bolsa japonesa, representando as 225 maiores empresas do Japão.',
+                trend: 'up',
+                change: '+2,15%',
+                historical: [
+                    { period: 'Hoje', value: '33.567,12' },
+                    { period: 'Ontem', value: '32.860,45' },
+                    { period: '1 sem', value: '32.456,78' },
+                    { period: '1 mês', value: '31.890,23' }
+                ],
+                impact: 'Nikkei em alta indica recuperação da economia japonesa.',
+                market: 'Terceira maior bolsa de valores do mundo'
+            }
+        };
+
+        // Open indicator modal
+        function openIndicatorModal(indicator) {
+            const data = indicatorsData[indicator];
+            if (!data) return;
+
+            const modal = document.getElementById('indicator-modal');
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+
+            // Update modal header
+            modalIcon.innerHTML = `<span class="text-2xl">${data.icon}</span>`;
+            modalTitle.textContent = data.title;
+
+            // Create modal content
+            const trendClass = data.trend === 'up' ? 'trend-up' : data.trend === 'down' ? 'trend-down' : 'trend-stable';
+            const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '→';
+
+            modalBody.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-4xl font-bold text-gradient">${data.current}</div>
+                        <div class="indicator-trend ${trendClass}">
+                            ${trendIcon} ${data.change}
+                        </div>
+                    </div>
+                    <p class="text-gray-300 leading-relaxed">${data.description}</p>
+                </div>
+
+                <div class="chart-mini mb-6">
+                    <h4 class="text-lg font-semibold mb-3">📈 Histórico Recente</h4>
+                    <div class="historical-data">
+                        ${data.historical.map(item => `
+                            <div class="data-point">
+                                <div class="text-xs text-gray-400 mb-1">${item.period}</div>
+                                <div class="font-semibold text-lumi-green">${item.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="glass-effect rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 flex items-center">
+                            <span class="text-lg mr-2">💡</span>
+                            Impacto na Economia
+                        </h4>
+                        <p class="text-sm text-gray-300">${data.impact}</p>
+                    </div>
+
+                    ${data.nextMeeting ? `
+                        <div class="glass-effect rounded-lg p-4">
+                            <h4 class="font-semibold mb-2 flex items-center">
+                                <span class="text-lg mr-2">📅</span>
+                                Próxima Reunião
+                            </h4>
+                            <p class="text-sm text-gray-300">${data.nextMeeting}</p>
+                        </div>
+                    ` : ''}
+
+                    ${data.target ? `
+                        <div class="glass-effect rounded-lg p-4">
+                            <h4 class="font-semibold mb-2 flex items-center">
+                                <span class="text-lg mr-2">🎯</span>
+                                Meta Oficial
+                            </h4>
+                            <p class="text-sm text-gray-300">${data.target}</p>
+                        </div>
+                    ` : ''}
+
+                    ${data.warning ? `
+                        <div class="glass-effect rounded-lg p-4 border border-yellow-500/30">
+                            <h4 class="font-semibold mb-2 flex items-center text-yellow-400">
+                                <span class="text-lg mr-2">⚠️</span>
+                                Atenção
+                            </h4>
+                            <p class="text-sm text-gray-300">${data.warning}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="glass-effect rounded-lg p-4">
+                        <h4 class="font-semibold mb-2 flex items-center">
+                            <span class="text-lg mr-2">📚</span>
+                            Para Jovens Investidores
+                        </h4>
+                        <p class="text-sm text-gray-300">
+                            ${getYouthTip(indicator)}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex space-x-3">
+                    <button onclick="addToWatchlist('${indicator}')" class="flex-1 gradient-bg text-white py-3 rounded-lg font-semibold interactive-button">
+                        ⭐ Adicionar aos Favoritos
+                    </button>
+                    <button onclick="shareIndicator('${indicator}')" class="flex-1 glass-effect text-lumi-blue py-3 rounded-lg font-semibold interactive-button border border-lumi-blue/30">
+                        📤 Compartilhar
+                    </button>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        // Close indicator modal
+        function closeIndicatorModal() {
+            const modal = document.getElementById('indicator-modal');
+            modal.classList.remove('active');
+        }
+
+        // Get youth-specific tips
+        function getYouthTip(indicator) {
+            const tips = {
+                selic: 'Com a Selic alta, considere investimentos em Tesouro Selic ou CDBs. É uma boa oportunidade para renda fixa!',
+                ipca: 'Acompanhe a inflação para proteger seu dinheiro. Investimentos que rendem acima do IPCA preservam seu poder de compra.',
+                cdi: 'O CDI é sua referência para renda fixa. Procure investimentos que paguem pelo menos 100% do CDI.',
+                dollar: 'Dólar alto pode ser oportunidade para investir em fundos cambiais ou ações de exportadoras.',
+                euro: 'Diversificar em moedas estrangeiras pode proteger contra desvalorização do real.',
+                bitcoin: 'Bitcoin é volátil mas pode ser parte de uma carteira diversificada. Comece com pouco!',
+                pound: 'Libra é uma moeda estável para diversificação internacional de longo prazo.',
+                ibovespa: 'Ibovespa em alta pode indicar bom momento para ações brasileiras. Estude as empresas antes de investir!',
+                sp500: 'S&P 500 é excelente para exposição ao mercado americano. Considere ETFs que replicam este índice.',
+                nasdaq: 'Para quem acredita em tecnologia, Nasdaq oferece exposição às maiores empresas de tech do mundo.',
+                nikkei: 'Mercado japonês pode oferecer diversificação geográfica interessante para sua carteira.'
+            };
+            return tips[indicator] || 'Sempre estude antes de investir e diversifique sua carteira!';
+        }
+
+        // Add to watchlist (placeholder)
+        function addToWatchlist(indicator) {
+            alert(`${indicatorsData[indicator].title} adicionado aos seus favoritos! 🌟`);
+        }
+
+        // Share indicator (placeholder)
+        function shareIndicator(indicator) {
+            const data = indicatorsData[indicator];
+            const text = `📊 ${data.title}: ${data.current} (${data.change}) - Acompanhe no Lumi Bank!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: `${data.title} - Lumi Bank`,
+                    text: text,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Informação copiada para a área de transferência! 📋');
+                });
+            }
+        }
+
+        // Update indicators with simulated real-time data
+        function updateIndicators() {
+            // Simulate small random changes
+            const elements = [
+                { id: 'selic-rate', base: 13.75 },
+                { id: 'ipca-rate', base: 4.62 },
+                { id: 'cdi-rate', base: 13.65 },
+                { id: 'dollar-rate', base: 5.12, prefix: 'R$ ' },
+                { id: 'euro-rate', base: 5.58, prefix: 'R$ ' },
+                { id: 'bitcoin-rate', base: 267450, prefix: 'R$ ', format: 'number' },
+                { id: 'pound-rate', base: 6.47, prefix: 'R$ ' },
+                { id: 'ibovespa-rate', base: 127845, format: 'number' },
+                { id: 'sp500-rate', base: 4567.89 },
+                { id: 'nasdaq-rate', base: 14234.56 },
+                { id: 'nikkei-rate', base: 33567.12 }
+            ];
+
+            elements.forEach(element => {
+                const variation = (Math.random() - 0.5) * 0.02; // ±1% variation
+                let newValue = element.base * (1 + variation);
+                
+                let displayValue;
+                if (element.format === 'number') {
+                    displayValue = Math.round(newValue).toLocaleString('pt-BR');
+                } else {
+                    displayValue = newValue.toFixed(2).replace('.', ',');
+                }
+                
+                const fullValue = (element.prefix || '') + displayValue + (element.id.includes('rate') && !element.prefix ? '%' : '');
+                
+                const elementNode = document.getElementById(element.id);
+                if (elementNode) {
+                    elementNode.textContent = fullValue;
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('indicator-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeIndicatorModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeIndicatorModal();
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add interactive effects
+        document.querySelectorAll('.gamification-element').forEach(element => {
+            element.addEventListener('mouseenter', () => {
+                element.style.transform = 'scale(1.02)';
+            });
+            
+            element.addEventListener('mouseleave', () => {
+                element.style.transform = 'scale(1)';
+            });
+        });
+
+
+// <----------------------------------- FIM ANIMAÇÕES E FUNCIONALIDADES INDICADORES ECONOMICOS --------------------------->
+
+
+// <------------------------------------ INICIO ANIMAÇÕES E FUNCIONALIDADES SITE ----------------------------------------->
 
 
         // Gamification System
@@ -648,6 +1092,14 @@
                                     <div class="font-bold text-lumi-green">8</div>
                                 </div>
                             </div>
+                            <div class="flex flex-col xs:flex-row sm:flex-row gap-2 sm:gap-3">
+                                <button onclick="closeFeatureDemo()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2.5 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Fechar
+                                </button>
+                                <button onclick="window.location.href='https://fernanda0408.github.io/Jogos-Lumi/'" class="flex-1 animated-gradient text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-300 text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Experimentar Agora
+                                </button>
+                            </div>
                         </div>
                     `
                 },
@@ -680,6 +1132,14 @@
                                 </div>
                                 <p class="text-xs text-gray-300 mt-1">Economize R$ 50 esta semana em delivery</p>
                             </div>
+                            <div class="flex flex-col xs:flex-row sm:flex-row gap-2 sm:gap-3">
+                                <button onclick="closeFeatureDemo()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2.5 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Fechar
+                                </button>
+                                <button class="flex-1 animated-gradient text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-300 text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Experimentar Agora
+                                </button>
+                            </div>
                         </div>
                     `
                 },
@@ -710,6 +1170,14 @@
                                     <div class="text-xs text-green-400">Economia</div>
                                     <div class="font-bold text-green-400">+8%</div>
                                 </div>
+                            </div>
+                            <div class="flex flex-col xs:flex-row sm:flex-row gap-2 sm:gap-3">
+                                <button onclick="closeFeatureDemo()" class="flex-1 bg-gray-700 hover:bg-gray-600 text-white py-2.5 sm:py-3 rounded-lg transition-colors text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Fechar
+                                </button>
+                                <button onclick="window.location.href='https://keth207.github.io/controlador-com-AI/'" class="flex-1 animated-gradient text-white py-2.5 sm:py-3 rounded-lg font-semibold hover:scale-105 transition-all duration-300 text-xs sm:text-sm md:text-base min-h-[44px]">
+                                    Experimentar Agora
+                                </button>
                             </div>
                         </div>
                     `
@@ -1580,451 +2048,7 @@
             }
         });
 
-//    <----------------------------- FIM ANIMAÇÕES E ESTRUTURA DO SITE ------------------------------>
-
-
-//    <-------------------------------- INDICADORES ECONOMICOS -------------------------------------->
-
-
-       // Mobile menu toggle
-        function toggleMobileMenu() {
-            const menu = document.getElementById('mobile-menu');
-            menu.classList.toggle('mobile-menu-open');
-            menu.classList.toggle('mobile-menu-closed');
-        }
-
-        // Mobile menu button event
-        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
-
-        // Close mobile menu when clicking on links
-        document.querySelectorAll('.mobile-menu-link').forEach(link => {
-            link.addEventListener('click', () => {
-                setTimeout(toggleMobileMenu, 100);
-            });
-        });
-
-        // Scroll progress
-        window.addEventListener('scroll', () => {
-            const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            document.getElementById('scroll-progress').style.width = scrolled + '%';
-        });
-
-        // Initialize calculator on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            calculateInvestment();
-            updateIndicators();
-            setInterval(updateIndicators, 30000); // Update every 30 seconds
-        });
-
-        // Economic Indicators Data (simulated API responses)
-        const indicatorsData = {
-            selic: {
-                title: 'Taxa Selic',
-                icon: '🏛️',
-                current: '13,75%',
-                description: 'A Taxa Selic é a taxa básica de juros da economia brasileira, definida pelo Comitê de Política Monetária (COPOM) do Banco Central.',
-                trend: 'up',
-                change: '+0,50%',
-                historical: [
-                    { period: '2024', value: '13,75%' },
-                    { period: '2023', value: '13,25%' },
-                    { period: '2022', value: '11,75%' },
-                    { period: '2021', value: '9,25%' }
-                ],
-                impact: 'Uma Selic alta torna investimentos em renda fixa mais atrativos, mas pode desacelerar o crescimento econômico.',
-                nextMeeting: '20 de Março de 2024'
-            },
-            ipca: {
-                title: 'IPCA (Inflação)',
-                icon: '📈',
-                current: '4,62%',
-                description: 'O IPCA é o índice oficial de inflação do Brasil, medindo a variação de preços de produtos e serviços consumidos pelas famílias.',
-                trend: 'down',
-                change: '-0,12%',
-                historical: [
-                    { period: 'Fev/24', value: '4,62%' },
-                    { period: 'Jan/24', value: '4,51%' },
-                    { period: 'Dez/23', value: '4,62%' },
-                    { period: 'Nov/23', value: '4,68%' }
-                ],
-                impact: 'Inflação controlada preserva o poder de compra e favorece investimentos de longo prazo.',
-                target: 'Meta: 3,00% ± 1,5 p.p.'
-            },
-            cdi: {
-                title: 'CDI',
-                icon: '💰',
-                current: '13,65%',
-                description: 'O CDI é a taxa média dos empréstimos entre bancos, servindo como referência para investimentos em renda fixa.',
-                trend: 'stable',
-                change: '0,00%',
-                historical: [
-                    { period: 'Hoje', value: '13,65%' },
-                    { period: 'Ontem', value: '13,65%' },
-                    { period: '1 sem', value: '13,60%' },
-                    { period: '1 mês', value: '13,40%' }
-                ],
-                impact: 'CDI alto beneficia investimentos como CDBs, LCIs e fundos DI.',
-                relation: 'Acompanha de perto a Taxa Selic'
-            },
-            dollar: {
-                title: 'Dólar Americano',
-                icon: '💵',
-                current: 'R$ 5,12',
-                description: 'Cotação do dólar americano em relação ao real brasileiro, importante indicador da economia global.',
-                trend: 'up',
-                change: '+1,23%',
-                historical: [
-                    { period: 'Hoje', value: 'R$ 5,12' },
-                    { period: 'Ontem', value: 'R$ 5,06' },
-                    { period: '1 sem', value: 'R$ 5,08' },
-                    { period: '1 mês', value: 'R$ 4,98' }
-                ],
-                impact: 'Dólar alto encarece importações mas favorece exportações brasileiras.',
-                factors: 'Influenciado por política monetária, cenário político e fluxo de capital'
-            },
-            euro: {
-                title: 'Euro',
-                icon: '🇪🇺',
-                current: 'R$ 5,58',
-                description: 'Cotação do euro em relação ao real, moeda oficial de 19 países da União Europeia.',
-                trend: 'up',
-                change: '+0,87%',
-                historical: [
-                    { period: 'Hoje', value: 'R$ 5,58' },
-                    { period: 'Ontem', value: 'R$ 5,53' },
-                    { period: '1 sem', value: 'R$ 5,51' },
-                    { period: '1 mês', value: 'R$ 5,45' }
-                ],
-                impact: 'Euro forte indica economia europeia sólida e pode afetar comércio bilateral.',
-                economy: 'Segunda maior economia mundial'
-            },
-            bitcoin: {
-                title: 'Bitcoin',
-                icon: '₿',
-                current: 'R$ 267.450',
-                description: 'Primeira e maior criptomoeda do mundo, considerada reserva de valor digital.',
-                trend: 'down',
-                change: '-2,34%',
-                historical: [
-                    { period: 'Hoje', value: 'R$ 267.450' },
-                    { period: 'Ontem', value: 'R$ 273.890' },
-                    { period: '1 sem', value: 'R$ 285.120' },
-                    { period: '1 mês', value: 'R$ 245.670' }
-                ],
-                impact: 'Bitcoin é volátil mas tem potencial de valorização a longo prazo.',
-                warning: 'Investimento de alto risco - invista apenas o que pode perder'
-            },
-            pound: {
-                title: 'Libra Esterlina',
-                icon: '🇬🇧',
-                current: 'R$ 6,47',
-                description: 'Moeda oficial do Reino Unido, uma das mais antigas moedas ainda em circulação.',
-                trend: 'up',
-                change: '+0,45%',
-                historical: [
-                    { period: 'Hoje', value: 'R$ 6,47' },
-                    { period: 'Ontem', value: 'R$ 6,44' },
-                    { period: '1 sem', value: 'R$ 6,41' },
-                    { period: '1 mês', value: 'R$ 6,38' }
-                ],
-                impact: 'Libra forte reflete estabilidade econômica pós-Brexit.',
-                context: 'Influenciada por políticas do Banco da Inglaterra'
-            },
-            ibovespa: {
-                title: 'Ibovespa',
-                icon: '📊',
-                current: '127.845',
-                description: 'Principal índice da bolsa brasileira (B3), composto pelas ações mais negociadas.',
-                trend: 'up',
-                change: '+1,23%',
-                historical: [
-                    { period: 'Hoje', value: '127.845' },
-                    { period: 'Ontem', value: '126.280' },
-                    { period: '1 sem', value: '125.670' },
-                    { period: '1 mês', value: '124.890' }
-                ],
-                impact: 'Ibovespa em alta indica otimismo com empresas brasileiras.',
-                composition: 'Representa ~80% do volume negociado na B3'
-            },
-            sp500: {
-                title: 'S&P 500',
-                icon: '🇺🇸',
-                current: '4.567,89',
-                description: 'Índice que acompanha as 500 maiores empresas americanas por capitalização de mercado.',
-                trend: 'down',
-                change: '-0,45%',
-                historical: [
-                    { period: 'Hoje', value: '4.567,89' },
-                    { period: 'Ontem', value: '4.588,45' },
-                    { period: '1 sem', value: '4.612,30' },
-                    { period: '1 mês', value: '4.534,20' }
-                ],
-                impact: 'S&P 500 é referência global para investimentos em ações.',
-                companies: 'Inclui Apple, Microsoft, Amazon, Google'
-            },
-            nasdaq: {
-                title: 'Nasdaq',
-                icon: '💻',
-                current: '14.234,56',
-                description: 'Índice focado em empresas de tecnologia, incluindo as maiores big techs do mundo.',
-                trend: 'up',
-                change: '+0,78%',
-                historical: [
-                    { period: 'Hoje', value: '14.234,56' },
-                    { period: 'Ontem', value: '14.124,89' },
-                    { period: '1 sem', value: '14.089,45' },
-                    { period: '1 mês', value: '13.987,23' }
-                ],
-                impact: 'Nasdaq reflete o desempenho do setor de tecnologia global.',
-                focus: 'Concentrado em empresas inovadoras e de crescimento'
-            },
-            nikkei: {
-                title: 'Nikkei 225',
-                icon: '🇯🇵',
-                current: '33.567,12',
-                description: 'Principal índice da bolsa japonesa, representando as 225 maiores empresas do Japão.',
-                trend: 'up',
-                change: '+2,15%',
-                historical: [
-                    { period: 'Hoje', value: '33.567,12' },
-                    { period: 'Ontem', value: '32.860,45' },
-                    { period: '1 sem', value: '32.456,78' },
-                    { period: '1 mês', value: '31.890,23' }
-                ],
-                impact: 'Nikkei em alta indica recuperação da economia japonesa.',
-                market: 'Terceira maior bolsa de valores do mundo'
-            }
-        };
-
-        // Open indicator modal
-        function openIndicatorModal(indicator) {
-            const data = indicatorsData[indicator];
-            if (!data) return;
-
-            const modal = document.getElementById('indicator-modal');
-            const modalIcon = document.getElementById('modal-icon');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-
-            // Update modal header
-            modalIcon.innerHTML = `<span class="text-2xl">${data.icon}</span>`;
-            modalTitle.textContent = data.title;
-
-            // Create modal content
-            const trendClass = data.trend === 'up' ? 'trend-up' : data.trend === 'down' ? 'trend-down' : 'trend-stable';
-            const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '→';
-
-            modalBody.innerHTML = `
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="text-4xl font-bold text-gradient">${data.current}</div>
-                        <div class="indicator-trend ${trendClass}">
-                            ${trendIcon} ${data.change}
-                        </div>
-                    </div>
-                    <p class="text-gray-300 leading-relaxed">${data.description}</p>
-                </div>
-
-                <div class="chart-mini mb-6">
-                    <h4 class="text-lg font-semibold mb-3">📈 Histórico Recente</h4>
-                    <div class="historical-data">
-                        ${data.historical.map(item => `
-                            <div class="data-point">
-                                <div class="text-xs text-gray-400 mb-1">${item.period}</div>
-                                <div class="font-semibold text-lumi-green">${item.value}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <div class="glass-effect rounded-lg p-4">
-                        <h4 class="font-semibold mb-2 flex items-center">
-                            <span class="text-lg mr-2">💡</span>
-                            Impacto na Economia
-                        </h4>
-                        <p class="text-sm text-gray-300">${data.impact}</p>
-                    </div>
-
-                    ${data.nextMeeting ? `
-                        <div class="glass-effect rounded-lg p-4">
-                            <h4 class="font-semibold mb-2 flex items-center">
-                                <span class="text-lg mr-2">📅</span>
-                                Próxima Reunião
-                            </h4>
-                            <p class="text-sm text-gray-300">${data.nextMeeting}</p>
-                        </div>
-                    ` : ''}
-
-                    ${data.target ? `
-                        <div class="glass-effect rounded-lg p-4">
-                            <h4 class="font-semibold mb-2 flex items-center">
-                                <span class="text-lg mr-2">🎯</span>
-                                Meta Oficial
-                            </h4>
-                            <p class="text-sm text-gray-300">${data.target}</p>
-                        </div>
-                    ` : ''}
-
-                    ${data.warning ? `
-                        <div class="glass-effect rounded-lg p-4 border border-yellow-500/30">
-                            <h4 class="font-semibold mb-2 flex items-center text-yellow-400">
-                                <span class="text-lg mr-2">⚠️</span>
-                                Atenção
-                            </h4>
-                            <p class="text-sm text-gray-300">${data.warning}</p>
-                        </div>
-                    ` : ''}
-
-                    <div class="glass-effect rounded-lg p-4">
-                        <h4 class="font-semibold mb-2 flex items-center">
-                            <span class="text-lg mr-2">📚</span>
-                            Para Jovens Investidores
-                        </h4>
-                        <p class="text-sm text-gray-300">
-                            ${getYouthTip(indicator)}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex space-x-3">
-                    <button onclick="addToWatchlist('${indicator}')" class="flex-1 gradient-bg text-white py-3 rounded-lg font-semibold interactive-button">
-                        ⭐ Adicionar aos Favoritos
-                    </button>
-                    <button onclick="shareIndicator('${indicator}')" class="flex-1 glass-effect text-lumi-blue py-3 rounded-lg font-semibold interactive-button border border-lumi-blue/30">
-                        📤 Compartilhar
-                    </button>
-                </div>
-            `;
-
-            modal.classList.add('active');
-        }
-
-        // Close indicator modal
-        function closeIndicatorModal() {
-            const modal = document.getElementById('indicator-modal');
-            modal.classList.remove('active');
-        }
-
-        // Get youth-specific tips
-        function getYouthTip(indicator) {
-            const tips = {
-                selic: 'Com a Selic alta, considere investimentos em Tesouro Selic ou CDBs. É uma boa oportunidade para renda fixa!',
-                ipca: 'Acompanhe a inflação para proteger seu dinheiro. Investimentos que rendem acima do IPCA preservam seu poder de compra.',
-                cdi: 'O CDI é sua referência para renda fixa. Procure investimentos que paguem pelo menos 100% do CDI.',
-                dollar: 'Dólar alto pode ser oportunidade para investir em fundos cambiais ou ações de exportadoras.',
-                euro: 'Diversificar em moedas estrangeiras pode proteger contra desvalorização do real.',
-                bitcoin: 'Bitcoin é volátil mas pode ser parte de uma carteira diversificada. Comece com pouco!',
-                pound: 'Libra é uma moeda estável para diversificação internacional de longo prazo.',
-                ibovespa: 'Ibovespa em alta pode indicar bom momento para ações brasileiras. Estude as empresas antes de investir!',
-                sp500: 'S&P 500 é excelente para exposição ao mercado americano. Considere ETFs que replicam este índice.',
-                nasdaq: 'Para quem acredita em tecnologia, Nasdaq oferece exposição às maiores empresas de tech do mundo.',
-                nikkei: 'Mercado japonês pode oferecer diversificação geográfica interessante para sua carteira.'
-            };
-            return tips[indicator] || 'Sempre estude antes de investir e diversifique sua carteira!';
-        }
-
-        // Add to watchlist (placeholder)
-        function addToWatchlist(indicator) {
-            alert(`${indicatorsData[indicator].title} adicionado aos seus favoritos! 🌟`);
-        }
-
-        // Share indicator (placeholder)
-        function shareIndicator(indicator) {
-            const data = indicatorsData[indicator];
-            const text = `📊 ${data.title}: ${data.current} (${data.change}) - Acompanhe no Lumi Bank!`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: `${data.title} - Lumi Bank`,
-                    text: text,
-                    url: window.location.href
-                });
-            } else {
-                navigator.clipboard.writeText(text).then(() => {
-                    alert('Informação copiada para a área de transferência! 📋');
-                });
-            }
-        }
-
-        // Update indicators with simulated real-time data
-        function updateIndicators() {
-            // Simulate small random changes
-            const elements = [
-                { id: 'selic-rate', base: 13.75 },
-                { id: 'ipca-rate', base: 4.62 },
-                { id: 'cdi-rate', base: 13.65 },
-                { id: 'dollar-rate', base: 5.12, prefix: 'R$ ' },
-                { id: 'euro-rate', base: 5.58, prefix: 'R$ ' },
-                { id: 'bitcoin-rate', base: 267450, prefix: 'R$ ', format: 'number' },
-                { id: 'pound-rate', base: 6.47, prefix: 'R$ ' },
-                { id: 'ibovespa-rate', base: 127845, format: 'number' },
-                { id: 'sp500-rate', base: 4567.89 },
-                { id: 'nasdaq-rate', base: 14234.56 },
-                { id: 'nikkei-rate', base: 33567.12 }
-            ];
-
-            elements.forEach(element => {
-                const variation = (Math.random() - 0.5) * 0.02; // ±1% variation
-                let newValue = element.base * (1 + variation);
-                
-                let displayValue;
-                if (element.format === 'number') {
-                    displayValue = Math.round(newValue).toLocaleString('pt-BR');
-                } else {
-                    displayValue = newValue.toFixed(2).replace('.', ',');
-                }
-                
-                const fullValue = (element.prefix || '') + displayValue + (element.id.includes('rate') && !element.prefix ? '%' : '');
-                
-                const elementNode = document.getElementById(element.id);
-                if (elementNode) {
-                    elementNode.textContent = fullValue;
-                }
-            });
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('indicator-modal').addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closeIndicatorModal();
-            }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeIndicatorModal();
-            }
-        });
-
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Add interactive effects
-        document.querySelectorAll('.gamification-element').forEach(element => {
-            element.addEventListener('mouseenter', () => {
-                element.style.transform = 'scale(1.02)';
-            });
-            
-            element.addEventListener('mouseleave', () => {
-                element.style.transform = 'scale(1)';
-            });
-        });
-
-
-//    <-------------------------------- FIM INDICADORES ECONOMICOS ---------------------------------->
-
-
 (function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ca7c171150a47d',t:'MTc1NDc3NjM5MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();
+
+
+// <--------------------------------------- FIM ANIMAÇÕES E FUNCIONALIDADES SITE ----------------------------------------->
