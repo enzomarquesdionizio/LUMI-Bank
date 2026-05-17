@@ -143,6 +143,9 @@
       .beam-spot{width:220px; height:220px}
       .lantern-mask{background: radial-gradient(140px 140px at var(--lx,50%) var(--ly,50%), rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.06) 40%, rgba(5,8,18,0.88) 60%, rgba(5,8,18,0.97) 100%)}
     }
+
+    /* Tira o scroll do Phone mockup */
+        .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
     /* iluminado ------------------------------------------------------------------------------------------------------- */
         body { 
             font-family: 'Inter', sans-serif; 
@@ -433,26 +436,6 @@
             box-shadow: 0 4px 12px rgba(0, 80, 255, 0.2);
         }
         
-        .pulse-animation {
-            /* Removed pulse animation for cleaner look */
-        }
-        
-        .slide-in {
-            /* Removed slide animation for cleaner look */
-        }
-        
-        .floating {
-            /* Removed floating animation for cleaner look */
-        }
-        
-        .rotate-slow {
-            /* Removed rotation animation for cleaner look */
-        }
-        
-        .glow {
-            /* Removed glow animation for cleaner look */
-        }
-        
         .progress-bar {
             background: linear-gradient(90deg, #0050FF, #00D2FF);
         }
@@ -465,26 +448,10 @@
             background: linear-gradient(45deg, #FFD700, #FFA500);
         }
         
-        .coin-animation {
-            /* Removed coin animation for cleaner look */
-        }
-        
-        .shake {
-            /* Removed shake animation for cleaner look */
-        }
-        
-        .typewriter {
-            /* Removed typewriter animation for cleaner look */
-        }
-        
         .glass-effect {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .neon-text {
-            /* Removed neon effect for cleaner look */
         }
         
         .interactive-button {
