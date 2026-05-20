@@ -145,7 +145,8 @@
     }
 
     /* Tira o scroll do Phone mockup */
-        .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
+    .no-scrollbar{-ms-overflow-style:none;scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}
+
     /* iluminado ------------------------------------------------------------------------------------------------------- */
         body { 
             font-family: 'Inter', sans-serif; 
@@ -453,7 +454,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+                
         .interactive-button {
             transition: all 0.2s ease;
         }
@@ -874,5 +875,4 @@
             animation: pulse 2s infinite;
             display: inline-block;
             margin-right: 8px;
-        }
-        
+        }     
