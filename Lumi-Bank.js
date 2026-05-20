@@ -504,23 +504,28 @@
         document.addEventListener('DOMContentLoaded', () => {
             calculateInvestment();
             updateIndicators();
+            carregarSelic();
+            carregarIPCA();
+            carregarCDI();
             setInterval(updateIndicators, 30000); // Update every 30 seconds
         });
 
-        // Economic Indicators Data (simulated API responses)
+        // Economic Indicators Data
         const indicatorsData = {
             selic: {
                 title: 'Taxa Selic',
                 icon: '🏛️',
-                current: '13,75%',
+                current: '',
                 description: 'A Taxa Selic é a taxa básica de juros da economia brasileira, definida pelo Comitê de Política Monetária (COPOM) do Banco Central.',
-                trend: 'up',
-                change: '+0,50%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: '2024', value: '13,75%' },
-                    { period: '2023', value: '13,25%' },
-                    { period: '2022', value: '11,75%' },
-                    { period: '2021', value: '9,25%' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Uma Selic alta torna investimentos em renda fixa mais atrativos, mas pode desacelerar o crescimento econômico.',
                 nextMeeting: '20 de Março de 2024'
@@ -528,15 +533,16 @@
             ipca: {
                 title: 'IPCA (Inflação)',
                 icon: '📈',
-                current: '4,62%',
-                description: 'O IPCA é o índice oficial de inflação do Brasil, medindo a variação de preços de produtos e serviços consumidos pelas famílias.',
-                trend: 'down',
-                change: '-0,12%',
+                current: '',
+                description: 'O IPCA é o índice oficial de inflação do Brasil, medindo a variação de preços de produtos e serviços consumidos pelas famílias no mês',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Fev/24', value: '4,62%' },
-                    { period: 'Jan/24', value: '4,51%' },
-                    { period: 'Dez/23', value: '4,62%' },
-                    { period: 'Nov/23', value: '4,68%' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Inflação controlada preserva o poder de compra e favorece investimentos de longo prazo.',
                 target: 'Meta: 3,00% ± 1,5 p.p.'
@@ -544,47 +550,47 @@
             cdi: {
                 title: 'CDI',
                 icon: '💰',
-                current: '13,65%',
+                current: '',
                 description: 'O CDI é a taxa média dos empréstimos entre bancos, servindo como referência para investimentos em renda fixa.',
-                trend: 'stable',
-                change: '0,00%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Hoje', value: '13,65%' },
-                    { period: 'Ontem', value: '13,65%' },
-                    { period: '1 sem', value: '13,60%' },
-                    { period: '1 mês', value: '13,40%' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'CDI alto beneficia investimentos como CDBs, LCIs e fundos DI.',
                 relation: 'Acompanha de perto a Taxa Selic'
             },
             dollar: {
                 title: 'Dólar Americano',
-                icon: '💵',
-                current: 'R$ 5,12',
+                icon: '$',
+                current: '',
                 description: 'Cotação do dólar americano em relação ao real brasileiro, importante indicador da economia global.',
-                trend: 'up',
-                change: '+1,23%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Hoje', value: 'R$ 5,12' },
-                    { period: 'Ontem', value: 'R$ 5,06' },
-                    { period: '1 sem', value: 'R$ 5,08' },
-                    { period: '1 mês', value: 'R$ 4,98' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Dólar alto encarece importações mas favorece exportações brasileiras.',
                 factors: 'Influenciado por política monetária, cenário político e fluxo de capital'
             },
             euro: {
                 title: 'Euro',
-                icon: '🇪🇺',
-                current: 'R$ 5,58',
+                icon: '€',
+                current: '',
                 description: 'Cotação do euro em relação ao real, moeda oficial de 19 países da União Europeia.',
-                trend: 'up',
-                change: '+0,87%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Hoje', value: 'R$ 5,58' },
-                    { period: 'Ontem', value: 'R$ 5,53' },
-                    { period: '1 sem', value: 'R$ 5,51' },
-                    { period: '1 mês', value: 'R$ 5,45' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Euro forte indica economia europeia sólida e pode afetar comércio bilateral.',
                 economy: 'Segunda maior economia mundial'
@@ -592,31 +598,31 @@
             bitcoin: {
                 title: 'Bitcoin',
                 icon: '₿',
-                current: 'R$ 267.450',
+                current: '',
                 description: 'Primeira e maior criptomoeda do mundo, considerada reserva de valor digital.',
-                trend: 'down',
-                change: '-2,34%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Hoje', value: 'R$ 267.450' },
-                    { period: 'Ontem', value: 'R$ 273.890' },
-                    { period: '1 sem', value: 'R$ 285.120' },
-                    { period: '1 mês', value: 'R$ 245.670' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Bitcoin é volátil mas tem potencial de valorização a longo prazo.',
                 warning: 'Investimento de alto risco - invista apenas o que pode perder'
             },
             pound: {
                 title: 'Libra Esterlina',
-                icon: '🇬🇧',
-                current: 'R$ 6,47',
+                icon: '£',
+                current: '',
                 description: 'Moeda oficial do Reino Unido, uma das mais antigas moedas ainda em circulação.',
-                trend: 'up',
-                change: '+0,45%',
+                trend: '',
+                change: '',
                 historical: [
-                    { period: 'Hoje', value: 'R$ 6,47' },
-                    { period: 'Ontem', value: 'R$ 6,44' },
-                    { period: '1 sem', value: 'R$ 6,41' },
-                    { period: '1 mês', value: 'R$ 6,38' }
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' },
+                    { period: '', value: '' }
                 ],
                 impact: 'Libra forte reflete estabilidade econômica pós-Brexit.',
                 context: 'Influenciada por políticas do Banco da Inglaterra'
@@ -688,7 +694,8 @@
         };
 
         // Open indicator modal
-        function openIndicatorModal(indicator) {
+        async function openIndicatorModal(indicator) {
+            await atualizarModal(indicator)
             const data = indicatorsData[indicator];
             if (!data) return;
 
@@ -838,43 +845,6 @@
             }
         }
 
-        // Update indicators with simulated real-time data
-        function updateIndicators() {
-            // Simulate small random changes
-            const elements = [
-                { id: 'selic-rate', base: 13.75 },
-                { id: 'ipca-rate', base: 4.62 },
-                { id: 'cdi-rate', base: 13.65 },
-                { id: 'dollar-rate', base: 5.12, prefix: 'R$ ' },
-                { id: 'euro-rate', base: 5.58, prefix: 'R$ ' },
-                { id: 'bitcoin-rate', base: 267450, prefix: 'R$ ', format: 'number' },
-                { id: 'pound-rate', base: 6.47, prefix: 'R$ ' },
-                { id: 'ibovespa-rate', base: 127845, format: 'number' },
-                { id: 'sp500-rate', base: 4567.89 },
-                { id: 'nasdaq-rate', base: 14234.56 },
-                { id: 'nikkei-rate', base: 33567.12 }
-            ];
-
-            elements.forEach(element => {
-                const variation = (Math.random() - 0.5) * 0.02; // ±1% variation
-                let newValue = element.base * (1 + variation);
-                
-                let displayValue;
-                if (element.format === 'number') {
-                    displayValue = Math.round(newValue).toLocaleString('pt-BR');
-                } else {
-                    displayValue = newValue.toFixed(2).replace('.', ',');
-                }
-                
-                const fullValue = (element.prefix || '') + displayValue + (element.id.includes('rate') && !element.prefix ? '%' : '');
-                
-                const elementNode = document.getElementById(element.id);
-                if (elementNode) {
-                    elementNode.textContent = fullValue;
-                }
-            });
-        }
-
         // Close modal when clicking outside
         document.getElementById('indicator-modal').addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-overlay')) {
@@ -915,6 +885,425 @@
         });
 
 
+// <----------------------------------- INICIO COTAÇÃO DE MOEDAS COM A API AwesomeAPI ------------------------------------>
+
+/* COTAÇÃO MOEDAS */
+const moedas = [
+    {
+        api: "USDBRL",
+        element: "dollar",
+        object: "dollar"
+    },
+
+    {
+        api: "EURBRL",
+        element: "euro",
+        object: "euro"
+    },
+
+    {
+        api: "BTCBRL",
+        element: "bitcoin",
+        object: "bitcoin"
+    },
+
+    {
+        api: "GBPBRL",
+        element: "pound",
+        object: "pound"
+    }
+];
+
+/* FORMATAR MOEDA */
+function formatarMoeda(valor) {
+
+    return Number(valor).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        minimumFractionDigits: 2
+    });
+
+}
+
+/* FORMATAR VARIAÇÃO CARD TELA INICIAL */
+function formatarVariacao(valor) {
+
+    const numero = Number(valor);
+
+    if (numero > 0) {
+        return `
+            <span class="text-xs text-green-400">
+                ↑ +${numero.toFixed(2).replace(".", ",")}%
+            </span>
+        `;
+    }
+
+    if (numero < 0) {
+        return `
+            <span class="text-xs text-red-400">
+                ↓ ${numero.toFixed(2).replace(".", ",")}%
+            </span>
+        `;
+    }
+
+    return `
+        <span class="text-xs text-blue-400">
+            → 0,00%
+        </span>
+    `;
+
+}
+
+
+/* CARD INDICADORES TELA */
+async function updateIndicators() {
+
+    try {
+
+        const resposta = await fetch(
+            "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,GBP-BRL"
+        );
+
+        const dados = await resposta.json();
+
+        moedas.forEach((moedas) => {
+
+            const info = dados[moedas.api];
+
+            // PREÇO
+            document.getElementById(`${moedas.element}-rate`).innerHTML =
+                formatarMoeda(info.bid);
+
+            // VARIAÇÃO
+            document.getElementById(`${moedas.element}-change`).innerHTML =
+                formatarVariacao(info.pctChange);
+
+        });
+
+        console.log(`API AwesomeAPI atualizada!`);
+
+    } catch (erro) {
+
+        console.log("Erro na API:", erro);
+
+    }
+
+}
+
+/* FORMATAR VARIAÇÃO MODAL */
+function FormatarVariacaoModal(valor) {
+
+    const numero = Number(valor);
+
+    return `${numero > 0 ? "+" : ""}${numero
+        .toFixed(2)
+        .replace(".", ",")}%`;
+
+}
+
+function obterTrend(valor) {
+
+    const numero = Number(valor);
+
+    if (numero > 0) return "up";
+
+    if (numero < 0) return "down";
+
+    return "stable";
+
+}
+
+/* CARD INDICADORES MODAL */
+async function atualizarModal(indicator) {
+
+    try {
+
+        // MAPA DAS MOEDAS
+        const moedasModal = {
+
+            dollar: "USD-BRL",
+
+            euro: "EUR-BRL",
+
+            bitcoin: "BTC-BRL",
+
+            pound: "GBP-BRL"
+
+        };
+
+        // PEGA MOEDA
+        const moeda = moedasModal[indicator];
+
+        // SE NÃO FOR MOEDA
+        if (!moeda) return;
+
+
+
+        /* COTAÇÃO ATUAL */
+        const respostaAtual = await fetch(
+            `https://economia.awesomeapi.com.br/json/last/${moeda}`
+        );
+
+        const atual = await respostaAtual.json();
+
+
+
+        /* HISTÓRICO */
+        const respostaHistorico = await fetch(
+            `https://economia.awesomeapi.com.br/json/daily/${moeda}/30`
+        );
+
+        const historico = await respostaHistorico.json();
+
+
+
+        // PEGA CHAVE AUTOMÁTICA
+        const chave = Object.keys(atual)[0];
+
+        const info = atual[chave];
+
+
+
+        /* VALORES */
+        const valorAtual = Number(info.bid);
+
+        const ontem = Number(historico[1]?.bid || valorAtual);
+
+        const semana = Number(historico[6]?.bid || valorAtual);
+
+        const mes = Number(historico[29]?.bid || valorAtual);
+
+
+
+        /* ATUALIZA DADOS */
+        indicatorsData[indicator].current =
+            formatarMoeda(valorAtual);
+
+        indicatorsData[indicator].change =
+            FormatarVariacaoModal(info.pctChange);
+
+        indicatorsData[indicator].trend =
+            obterTrend(info.pctChange);
+
+
+
+        /* HISTÓRICO MOEDAS */
+        indicatorsData[indicator].historical = [
+
+            {
+                period: "Hoje",
+                value: formatarMoeda(valorAtual)
+            },
+
+            {
+                period: "Ontem",
+                value: formatarMoeda(ontem)
+            },
+
+            {
+                period: "1 semana",
+                value: formatarMoeda(semana)
+            },
+
+            {
+                period: "1 mês",
+                value: formatarMoeda(mes)
+            }
+
+        ];
+
+        console.log(`${indicator} atualizado!`);
+
+    } catch (erro) {
+
+        console.log("Erro modal:", erro);
+
+    }
+
+}
+
+// <------------------------------------ FIM COTAÇÃO DE MOEDAS COM A API AwesomeAPI ------------------------------------->
+
+
+// <----------------------------- INICIO ÍNDICES DE MERCADO COM A API Banco central do Brasil (BCB) - SGS -------------------->
+
+
+function calcularVariacao(atual, anterior) {
+
+    return (
+        ((atual - anterior) / anterior) * 100
+    );
+
+}
+
+async function carregarSelic() {
+
+    try {
+
+        const resposta = await fetch(
+            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/2?formato=json"
+        );
+
+        const dados = await resposta.json();
+
+        const atual = Number(dados[1].valor);
+        const anterior = Number(dados[0].valor);
+
+        const variacao =
+            calcularVariacao(atual, anterior);
+
+        // CARD
+        document.getElementById("selic-rate").innerHTML =
+            atual.toFixed(2).replace(".", ",") + "%";
+
+        document.getElementById("selic-change").innerHTML =
+            formatarVariacao(variacao);
+
+        // INDICADORES NO MODAL
+        indicatorsData.selic.current =
+            atual.toFixed(2).replace(".", ",") + "%";
+
+        indicatorsData.selic.change =
+            FormatarVariacaoModal(variacao);
+
+        console.log("API BCB carregada.");
+
+    } catch (erro) {
+
+        console.log("Erro SELIC:", erro);
+
+    }
+
+}
+
+
+async function carregarIPCA() {
+
+    try {
+
+        const resposta = await fetch(
+            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json"
+        );
+
+        const historicoIPCA = await resposta.json();
+
+        const datamesatual = historicoIPCA[11].data;
+        const datames2 = historicoIPCA[10].data;
+        const datames3 = historicoIPCA[9].data;
+        const datames6 = historicoIPCA[6].data;
+        const datames12 = historicoIPCA[0].data;
+
+        const mesatual = Number(historicoIPCA[11].valor);
+        const mes2 = Number(historicoIPCA[10].valor);
+        const mes3 = Number(historicoIPCA[9].valor);
+        const mes6 = Number(historicoIPCA[6].valor);
+        const mes12 = Number(historicoIPCA[0].valor);
+        
+
+        const variacao =
+            calcularVariacao(mesatual, mes2);
+
+        // CARD
+        document.getElementById("ipca-rate").innerHTML =
+            mesatual.toFixed(2).replace(".", ",") + "%";
+
+        document.getElementById("ipca-change").innerHTML =
+            formatarVariacao(variacao);
+
+
+
+        // INDICADORES NO MODAL
+        indicatorsData.ipca.current =
+            mesatual.toFixed(2).replace(".", ",") + "%";
+
+        indicatorsData.ipca.change =
+            FormatarVariacaoModal(variacao);
+
+        indicatorsData.ipca.trend =
+            obterTrend(variacao);
+
+        indicatorsData.ipca.historical = [
+            {
+                period: datamesatual,
+                value: mesatual.toFixed(2).replace(".", ",") + "%"
+            },
+
+            {
+                period: datames2,
+                value: mes2.toFixed(2).replace(".", ",") + "%"
+            },
+
+            {
+                period: datames3,
+                value: mes3.toFixed(2).replace(".", ",") + "%"
+            },
+
+            {
+                period: datames6,
+                value: mes6.toFixed(2).replace(".", ",") + "%"
+            },
+
+            {
+                period: datames12,
+                value: mes12.toFixed(2).replace(".", ",") + "%"
+            }
+
+        ];
+
+        console.log("API BCB IPCA carregado.");
+
+    } catch (erro) {
+
+        console.log("Erro IPCA:", erro);
+
+    }
+
+}
+
+async function carregarCDI() {
+
+    try {
+
+        const resposta = await fetch(
+            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados/ultimos/2?formato=json"
+        );
+
+        const dados = await resposta.json();
+
+        const atual = Number(dados[1].valor);
+        const anterior = Number(dados[0].valor);
+
+        const variacao =
+            calcularVariacao(atual, anterior);
+
+        // CARD
+        document.getElementById("cdi-rate").innerHTML =
+            atual.toFixed(2).replace(".", ",") + "%";
+
+        document.getElementById("cdi-change").innerHTML =
+            formatarVariacao(variacao);
+
+        // INDICADORES NO MODAL
+        indicatorsData.cdi.current =
+            atual.toFixed(2).replace(".", ",") + "%";
+
+        indicatorsData.cdi.change =
+            FormatarVariacaoModal(variacao);
+
+        console.log("API CDI carregada.");
+
+    } catch (erro) {
+
+        console.log("Erro CDI:", erro);
+
+    }
+
+}
+
+
+// <----------------------------- FIM ÍNDICES DE MERCADO COM A API Banco central do Brasil (BCB) - SGS ------------------------>
+
+
 // <----------------------------------- FIM ANIMAÇÕES E FUNCIONALIDADES INDICADORES ECONOMICOS --------------------------->
 
 
@@ -946,7 +1335,7 @@
             ]
         };
 
-        // Financial Indicators Data
+        /*// Financial Indicators Data
         let financialData = {
             currencies: {
                 usd: { rate: 5.12, change: 0.8 },
@@ -968,7 +1357,7 @@
                 gold: { price: 2018, change: -0.5 },
                 soy: { price: 12.87, change: 1.3 }
             }
-        };
+        };*/
 
         // Particle System
         function createParticles() {
