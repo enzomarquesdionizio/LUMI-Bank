@@ -19,7 +19,7 @@
     // Time-based auto theme (manhã 6-17)
     function autoTheme(){
       const h = new Date().getHours();
-      isNight = !(h >= 6 && h <= 17);
+      // isNight = !(h >= 6 && h <= 17);
       applyTheme(false);
     }
 
@@ -504,9 +504,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             calculateInvestment();
             updateIndicators();
-            carregarSelic();
-            carregarIPCA();
-            carregarCDI();
+            carregarIndicadoresEconomicos();
             setInterval(updateIndicators, 30000); // Update every 30 seconds
         });
 
@@ -528,7 +526,7 @@
                     { period: '', value: '' }
                 ],
                 impact: 'Uma Selic alta torna investimentos em renda fixa mais atrativos, mas pode desacelerar o crescimento econômico.',
-                nextMeeting: '20 de Março de 2024'
+                nextMeeting: 'A representaçõa acima mostra a taxa acumulada de cada ano civil, por isso pode ocorrer divergências entre a Selic atual e a do ano vigente.'
             },
             ipca: {
                 title: 'IPCA (Inflação)',
@@ -748,7 +746,7 @@
                         <div class="glass-effect rounded-lg p-4">
                             <h4 class="font-semibold mb-2 flex items-center">
                                 <span class="text-lg mr-2">📅</span>
-                                Próxima Reunião
+                                Histórico Selic
                             </h4>
                             <p class="text-sm text-gray-300">${data.nextMeeting}</p>
                         </div>
@@ -1125,183 +1123,850 @@ async function atualizarModal(indicator) {
 // <------------------------------------ FIM COTAÇÃO DE MOEDAS COM A API AwesomeAPI ------------------------------------->
 
 
-// <----------------------------- INICIO ÍNDICES DE MERCADO COM A API Banco central do Brasil (BCB) - SGS -------------------->
+// <----------------------------- INICIO ÍNDICES DE MERCADO COM A API CORRIGIR VALOR -------------------->
 
+
+/*
+ * ============================================================
+ * Documentação:
+ * https://www.corrigirvalor.com.br/api
+ *
+ * Indicadores utilizados:
+ *
+ * SELIC
+ * IPCA
+ * CDI
+ *
+ * A API fornece:
+ *
+ * - série mensal
+ * - último mês disponível
+ * - acumulado de 12 meses
+ *
+ * ============================================================
+ */
+
+
+const API_INDICES =
+    "https://www.corrigirvalor.com.br/api/indice";
+
+const API_RESUMO =
+    "https://www.corrigirvalor.com.br/api/indices";
+
+
+/* UTILITÁRIOS */
 
 function calcularVariacao(atual, anterior) {
 
+    if (
+        !Number.isFinite(atual) ||
+        !Number.isFinite(anterior) ||
+        anterior === 0
+    ) {
+
+        return 0;
+
+    }
+
     return (
-        ((atual - anterior) / anterior) * 100
+        ((atual - anterior) / Math.abs(anterior)) * 100
     );
 
 }
+
+function calcularAcumulado12(valores, indiceFinal) {
+    const datas = Object.keys(valores).sort();
+
+    if (indiceFinal < 11) return null;
+
+    return datas
+        .slice(indiceFinal - 11, indiceFinal + 1)
+        .reduce(
+            (fator, data) => fator * (1 + Number(valores[data]) / 100),
+            1
+        ) - 1;
+}
+
+
+function formatarPercentual(valor) {
+
+    const numero = Number(valor);
+
+    if (!Number.isFinite(numero)) {
+
+        return "0,00%";
+
+    }
+
+    return (
+        numero
+            .toFixed(2)
+            .replace(".", ",") + "%"
+    );
+
+}
+
+
+function formatarPeriodo(periodo) {
+
+    if (!periodo) {
+
+        return "";
+
+    }
+
+    const partes =
+        periodo.split("-");
+
+    if (partes.length !== 2) {
+
+        return periodo;
+
+    }
+
+    const ano =
+        partes[0];
+
+    const mes =
+        Number(partes[1]);
+
+    const meses = [
+
+        "Jan",
+        "Fev",
+        "Mar",
+        "Abr",
+        "Mai",
+        "Jun",
+        "Jul",
+        "Ago",
+        "Set",
+        "Out",
+        "Nov",
+        "Dez"
+
+    ];
+
+    return `${meses[mes - 1]}/${ano}`;
+
+}
+
+
+/* BUSCAR RESUMO DOS ÍNDICES */
+
+
+async function buscarResumoIndices() {
+
+    const resposta =
+        await fetch(API_RESUMO);
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            `Erro HTTP ${resposta.status} ao buscar índices`
+        );
+
+    }
+
+    const dados =
+        await resposta.json();
+
+    if (
+        !dados ||
+        !Array.isArray(dados.indices)
+    ) {
+
+        throw new Error(
+            "Resposta inválida da API de índices."
+        );
+
+    }
+
+    return dados.indices;
+
+}
+
+
+/* BUSCAR SÉRIE COMPLETA */
+
+async function buscarIndice(indice) {
+
+    const resposta =
+        await fetch(
+            `${API_INDICES}/${indice}`
+        );
+
+    if (!resposta.ok) {
+
+        throw new Error(
+            `Erro HTTP ${resposta.status} ao buscar ${indice}`
+        );
+
+    }
+
+    const dados =
+        await resposta.json();
+
+    if (
+        !dados ||
+        !dados.valores
+    ) {
+
+        throw new Error(
+            `Dados inválidos recebidos para ${indice}`
+        );
+
+    }
+
+    return dados;
+
+}
+
+
+/* LOCALIZAR ÍNDICE NO RESUMO */
+
+function localizarIndice(resumo, slug) {
+
+    return resumo.find(
+        item => item.slug === slug
+    );
+
+}
+
+
+/* OBTER ÚLTIMOS VALORES */
+
+function obterUltimosValores(valores) {
+
+    const datas =
+        Object.keys(valores)
+            .sort();
+
+    if (datas.length < 2) {
+
+        throw new Error(
+            "Histórico insuficiente."
+        );
+
+    }
+
+    const dataAtual =
+        datas[datas.length - 1];
+
+    const dataAnterior =
+        datas[datas.length - 2];
+
+    const atual =
+        Number(valores[dataAtual]);
+
+    const anterior =
+        Number(valores[dataAnterior]);
+
+    return {
+
+        datas,
+
+        dataAtual,
+
+        dataAnterior,
+
+        atual,
+
+        anterior
+
+    };
+
+}
+
+
+/* CRIAR HISTÓRICO */
+
+function criarHistorico(valores, quantidade = 6) {
+    const datas = Object.keys(valores).sort();
+
+    return datas
+        .slice(-quantidade)
+        .reverse()
+        .map((data, _, ultimas) => {
+            const i = datas.indexOf(data);
+            if (i < 11) return null;
+
+            const acumulado = datas
+                .slice(i - 11, i + 1)
+                .reduce((fator, periodo) =>
+                    fator * (1 + Number(valores[periodo]) / 100), 1);
+
+            const valor = (acumulado - 1) * 100;
+
+            return {
+                period: formatarPeriodo(data),
+                value: `${valor >= 0 ? "+" : ""}${valor.toFixed(2).replace(".", ",")}%`
+            };
+        })
+        .filter(Boolean);
+}
+
+
+/*
+ * ============================================================
+ * SELIC
+ *
+ * IMPORTANTE:
+ *
+ * A API alternativa trabalha com a Selic acumulada.
+ * Para o valor principal utilizamos o acumulado de 12 meses.
+ *
+ * O histórico continua mostrando a série mensal.
+ * ============================================================
+ */
+
 
 async function carregarSelic() {
 
     try {
 
         const resposta = await fetch(
-            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/2?formato=json"
+            "https://www.corrigirvalor.com.br/api/indice/selic"
         );
+
+        if (!resposta.ok) {
+            throw new Error(
+                `Erro HTTP ${resposta.status}`
+            );
+        }
 
         const dados = await resposta.json();
 
-        const atual = Number(dados[1].valor);
-        const anterior = Number(dados[0].valor);
+        const valores = dados.valores || {};
 
-        const variacao =
-            calcularVariacao(atual, anterior);
+        if (!Object.keys(valores).length) {
+            throw new Error(
+                "A API não retornou a série da Selic."
+            );
+        }
 
-        // CARD
-        document.getElementById("selic-rate").innerHTML =
-            atual.toFixed(2).replace(".", ",") + "%";
+        // 1. SELIC ATUAL — ACUMULADO DOS ÚLTIMOS 12 MESES
 
-        document.getElementById("selic-change").innerHTML =
-            formatarVariacao(variacao);
+        const taxaAtual = Number(
+            dados.acumulado12
+        );
 
-        // INDICADORES NO MODAL
+        if (!Number.isFinite(taxaAtual)) {
+            throw new Error(
+                "A API não retornou o acumulado de 12 meses."
+            );
+        }
+
+        // 2. ORGANIZA OS DADOS POR ANO
+
+        const valoresPorAno = {};
+
+        Object.entries(valores).forEach(
+            ([periodo, valor]) => {
+
+                const ano =
+                    periodo.substring(0, 4);
+
+                const taxa =
+                    Number(valor);
+
+                if (!Number.isFinite(taxa)) {
+                    return;
+                }
+
+                if (!valoresPorAno[ano]) {
+                    valoresPorAno[ano] = [];
+                }
+
+                valoresPorAno[ano].push({
+                    periodo,
+                    taxa
+                });
+
+            }
+        );
+
+        /* 3. CALCULA O ACUMULADO DE CADA ANO
+        
+        // Exemplo:
+        // Janeiro 1,16%
+        // Fevereiro 1,00%
+        
+        // Não fazemos:
+        // 1,16 + 1,00
+        
+        // Fazemos:
+        // (1 + 1,16/100) *
+        // (1 + 1,00/100) - 1 */
+
+        const acumuladoPorAno = {};
+
+        Object.entries(valoresPorAno).forEach(
+            ([ano, meses]) => {
+
+                let fator = 1;
+
+                meses.forEach(({ taxa }) => {
+
+                    fator *=
+                        1 + (taxa / 100);
+
+                });
+
+                acumuladoPorAno[ano] =
+                    (fator - 1) * 100;
+
+            }
+        );
+
+
+        // 4. ÚLTIMOS 5 ANOS
+
+        const anos = Object.keys(
+            acumuladoPorAno
+        )
+            .sort((a, b) => Number(b) - Number(a))
+            .slice(0, 5);
+
+        // 5. ATUALIZA O CARD
+
+        document.getElementById(
+            "selic-rate"
+        ).innerHTML =
+            taxaAtual
+                .toFixed(2)
+                .replace(".", ",") + "%";
+
+
+        /* 6. VARIAÇÃO DO CARD
+        // Comparamos o acumulado atual de 12 meses
+        // com o acumulado de 12 meses anterior.
+        //
+        // A API fornece o acumulado de 12 meses
+        // associado a cada mês. */
+
+        const periodos = Object.keys(valores)
+            .sort();
+
+        const ultimoPeriodo =
+            periodos[periodos.length - 1];
+
+        const periodoAnterior =
+            periodos[periodos.length - 2];
+
+        let taxaAnterior = null;
+
+
+        /*
+         Para descobrir o acumulado de 12 meses
+         anterior, calculamos os 12 meses que
+         terminam no período anterior.
+         */
+
+        if (periodos.length >= 13) {
+
+            const indiceAnterior =
+                periodos.indexOf(
+                    periodoAnterior
+                );
+
+            const janelaAnterior =
+                periodos.slice(
+                    Math.max(
+                        0,
+                        indiceAnterior - 11
+                    ),
+                    indiceAnterior + 1
+                );
+
+            if (janelaAnterior.length === 12) {
+
+                let fatorAnterior = 1;
+
+                janelaAnterior.forEach(
+                    periodo => {
+
+                        const taxa =
+                            Number(
+                                valores[periodo]
+                            );
+
+                        if (
+                            Number.isFinite(taxa)
+                        ) {
+
+                            fatorAnterior *=
+                                1 + (taxa / 100);
+
+                        }
+
+                    }
+                );
+
+                taxaAnterior =
+                    (fatorAnterior - 1) * 100;
+
+            }
+
+        }
+
+        // CALCULA A VARIAÇÃO
+
+        let variacao = 0;
+
+        if (
+            Number.isFinite(taxaAnterior) &&
+            taxaAnterior !== 0
+        ) {
+
+            variacao =
+                calcularVariacao(
+                    taxaAtual,
+                    taxaAnterior
+                );
+
+        }
+
+
+        // ATUALIZA O CARD
+
+        document.getElementById(
+            "selic-change"
+        ).innerHTML =
+            formatarVariacao(
+                variacao
+            );
+
+
+        // ATUALIZA indicatorsData
+
         indicatorsData.selic.current =
-            atual.toFixed(2).replace(".", ",") + "%";
+            taxaAtual
+                .toFixed(2)
+                .replace(".", ",") + "%";
 
         indicatorsData.selic.change =
-            FormatarVariacaoModal(variacao);
+            FormatarVariacaoModal(
+                variacao
+            );
 
-        console.log("API BCB carregada.");
+        indicatorsData.selic.trend =
+            obterTrend(
+                variacao
+            );
+
+
+        // 7. HISTÓRICO DO MODAL
+
+        indicatorsData.selic.historical =
+            anos.map(ano => ({
+                period: ano,
+                value:
+                    acumuladoPorAno[ano]
+                        .toFixed(2)
+                        .replace(".", ",") + "%"
+            }));
+
+
+        console.log(
+            "Selic acumulada 12 meses:",
+            taxaAtual + "%"
+        );
+
+        console.log(
+            "Selic acumulada 12 meses anterior:",
+            taxaAnterior !== null
+                ? taxaAnterior.toFixed(2) + "%"
+                : "N/A"
+        );
+
+        console.log(
+            "Variação Selic:",
+            variacao.toFixed(2) + "%"
+        );
+
+        console.log(
+            "Histórico Selic:",
+            indicatorsData.selic.historical
+        );
+
 
     } catch (erro) {
 
-        console.log("Erro SELIC:", erro);
+        console.error(
+            "Erro ao carregar Selic:",
+            erro
+        );
 
     }
 
 }
+
+
+/*
+ * ============================================================
+ * IPCA
+ *
+ * Valor principal:
+ * último IPCA mensal divulgado.
+ *
+ * Histórico:
+ * últimos 5 meses.
+ * ============================================================
+ */
 
 
 async function carregarIPCA() {
 
     try {
 
-        const resposta = await fetch(
-            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados/ultimos/12?formato=json"
-        );
+        const [
+            resumo,
+            serie
+        ] =
+            await Promise.all([
 
-        const historicoIPCA = await resposta.json();
+                buscarResumoIndices(),
 
-        const datamesatual = historicoIPCA[11].data;
-        const datames2 = historicoIPCA[10].data;
-        const datames3 = historicoIPCA[9].data;
-        const datames6 = historicoIPCA[6].data;
-        const datames12 = historicoIPCA[0].data;
+                buscarIndice("ipca")
 
-        const mesatual = Number(historicoIPCA[11].valor);
-        const mes2 = Number(historicoIPCA[10].valor);
-        const mes3 = Number(historicoIPCA[9].valor);
-        const mes6 = Number(historicoIPCA[6].valor);
-        const mes12 = Number(historicoIPCA[0].valor);
-        
-
-        const variacao =
-            calcularVariacao(mesatual, mes2);
-
-        // CARD
-        document.getElementById("ipca-rate").innerHTML =
-            mesatual.toFixed(2).replace(".", ",") + "%";
-
-        document.getElementById("ipca-change").innerHTML =
-            formatarVariacao(variacao);
+            ]);
 
 
+        const info =
+            localizarIndice(
+                resumo,
+                "ipca"
+            );
 
-        // INDICADORES NO MODAL
+
+    const datas = Object.keys(serie.valores).sort();
+    const indiceAtual = datas.length - 1;
+    const indiceAnterior = datas.length - 2;
+
+    const valorAtual =
+        Number(info?.acumulado12) ||
+        calcularAcumulado12(serie.valores, indiceAtual) * 100;
+
+    const acumuladoAnterior =
+        calcularAcumulado12(serie.valores, indiceAnterior) * 100;
+
+    const variacao =
+        calcularVariacao(valorAtual, acumuladoAnterior);
+
+
+        /*
+         * CARD
+         */
+
+        document.getElementById(
+            "ipca-rate"
+        ).innerHTML =
+            formatarPercentual(
+                valorAtual
+            );
+
+
+        document.getElementById(
+            "ipca-change"
+        ).innerHTML =
+            formatarVariacao(
+                variacao
+            );
+
+
+        /*
+         * MODAL
+         */
+
         indicatorsData.ipca.current =
-            mesatual.toFixed(2).replace(".", ",") + "%";
+            formatarPercentual(
+                valorAtual
+            );
+
 
         indicatorsData.ipca.change =
-            FormatarVariacaoModal(variacao);
+            FormatarVariacaoModal(
+                variacao
+            );
+
 
         indicatorsData.ipca.trend =
-            obterTrend(variacao);
+            obterTrend(
+                variacao
+            );
 
-        indicatorsData.ipca.historical = [
-            {
-                period: datamesatual,
-                value: mesatual.toFixed(2).replace(".", ",") + "%"
-            },
 
-            {
-                period: datames2,
-                value: mes2.toFixed(2).replace(".", ",") + "%"
-            },
+        indicatorsData.ipca.historical =
+            criarHistorico(
+                serie.valores,
+                6
+            );
 
-            {
-                period: datames3,
-                value: mes3.toFixed(2).replace(".", ",") + "%"
-            },
 
-            {
-                period: datames6,
-                value: mes6.toFixed(2).replace(".", ",") + "%"
-            },
+        console.log(
+            "IPCA atualizado:",
+            dataAtual,
+            valorAtual
+        );
 
-            {
-                period: datames12,
-                value: mes12.toFixed(2).replace(".", ",") + "%"
-            }
+    }
 
-        ];
+    catch (erro) {
 
-        console.log("API BCB IPCA carregado.");
-
-    } catch (erro) {
-
-        console.log("Erro IPCA:", erro);
+        console.error(
+            "Erro IPCA:",
+            erro
+        );
 
     }
 
 }
+
+
+/*
+ * ============================================================
+ * CDI
+ *
+ * Valor principal:
+ * acumulado em 12 meses.
+ *
+ * Histórico:
+ * últimos 5 meses da série mensal.
+ * ============================================================
+ */
+
 
 async function carregarCDI() {
 
-    try {
+    try { 
+        
+        const [resumo, serie] =
+            await Promise.all([ 
+                buscarResumoIndices(),
+                buscarIndice("cdi")
+            ]);
 
-        const resposta = await fetch(
-            "https://api.bcb.gov.br/dados/serie/bcdata.sgs.12/dados/ultimos/2?formato=json"
-        );
+        const info = localizarIndice(resumo,"cdi");
 
-        const dados = await resposta.json();
+    const datas = Object.keys(serie.valores).sort();
+    const indiceAtual = datas.length - 1;
+    const indiceAnterior = datas.length - 2;
 
-        const atual = Number(dados[1].valor);
-        const anterior = Number(dados[0].valor);
+    const valorAtual =
+        Number(info?.acumulado12) ||
+        calcularAcumulado12(serie.valores, indiceAtual) * 100;
 
-        const variacao =
-            calcularVariacao(atual, anterior);
+    const acumuladoAnterior =
+        calcularAcumulado12(serie.valores, indiceAnterior) * 100;
 
-        // CARD
-        document.getElementById("cdi-rate").innerHTML =
-            atual.toFixed(2).replace(".", ",") + "%";
+    const variacao =
+        calcularVariacao(valorAtual, acumuladoAnterior);
 
-        document.getElementById("cdi-change").innerHTML =
-            formatarVariacao(variacao);
 
-        // INDICADORES NO MODAL
+        /*
+         * CARD
+         */
+
+        document.getElementById(
+            "cdi-rate"
+        ).innerHTML =
+            formatarPercentual(
+                valorAtual
+            );
+
+
+        document.getElementById(
+            "cdi-change"
+        ).innerHTML =
+            formatarVariacao(
+                variacao
+            );
+
+
+        /*
+         * MODAL
+         */
+
         indicatorsData.cdi.current =
-            atual.toFixed(2).replace(".", ",") + "%";
+            formatarPercentual(
+                valorAtual
+            );
+
 
         indicatorsData.cdi.change =
-            FormatarVariacaoModal(variacao);
+            FormatarVariacaoModal(
+                variacao
+            );
 
-        console.log("API CDI carregada.");
 
-    } catch (erro) {
+        indicatorsData.cdi.trend =
+            obterTrend(
+                variacao
+            );
 
-        console.log("Erro CDI:", erro);
+
+        indicatorsData.cdi.historical =
+            criarHistorico(
+                serie.valores,
+                6
+            );
+
+
+        console.log(
+            "CDI atualizado:",
+            valorAtual
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro CDI:",
+            erro
+        );
 
     }
 
 }
 
 
-// <----------------------------- FIM ÍNDICES DE MERCADO COM A API Banco central do Brasil (BCB) - SGS ------------------------>
+/*
+ ============================================================
+ * CARREGAR TODOS OS INDICADORES */
+
+
+async function carregarIndicadoresEconomicos() {
+
+    try {
+
+        await Promise.all([
+            carregarSelic(),
+            carregarIPCA(),
+            carregarCDI()
+        ]);
+
+
+        console.log(
+            "Todos os indicadores econômicos foram atualizados."
+        );
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "Erro ao carregar indicadores econômicos:",
+            erro
+        );
+
+    }
+
+}
+
+
+// <-------------------------------------- FIM ÍNDICES DE MERCADO COM A API CORRIGIR VALOR -------------------------->
 
 
 // <----------------------------------- FIM ANIMAÇÕES E FUNCIONALIDADES INDICADORES ECONOMICOS --------------------------->
